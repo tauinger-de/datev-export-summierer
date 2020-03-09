@@ -1,17 +1,18 @@
 package de.auinger.datev.summierer
 
-import com.fasterxml.jackson.annotation.JsonPropertyOrder
+import java.math.BigDecimal
 
-@JsonPropertyOrder(value = [
-    "amount",
-    "sollHaben"
-])
 data class ExportEntry(
-        val amount: String,
-        val sollHaben: String
+        val umsatz: BigDecimal,
+        val sollHaben: SollHaben,
+        val gegenkonto: Int,
+        val monat: Int
 ) {
 
-    constructor() :
-            this("", "")
-
+    val umsatzMitVorzeichen: BigDecimal
+        get() = if (sollHaben == SollHaben.S) umsatz else umsatz.negate()
 }
+
+
+enum class SollHaben { S, H }
+

@@ -1,26 +1,58 @@
 package de.auinger.datev.summierer
 
+import com.fasterxml.jackson.databind.MappingIterator
+import com.fasterxml.jackson.databind.ObjectReader
 import com.fasterxml.jackson.dataformat.csv.CsvMapper
+import com.fasterxml.jackson.dataformat.csv.CsvParser
+import java.io.File
+import java.io.FileInputStream
+import java.io.FileReader
+import java.io.InputStreamReader
 import java.nio.charset.Charset
 import java.nio.file.Files
 import java.nio.file.Paths
 
-class Summarizer(private val exportFilePath:String) {
 
-    init {
-        readFile()
+class Summarizer(private val exportFilePath:String) : Runnable {
+
+    override fun run() {
+        val entries = readEntries2()
+
+        val summary = Summary()
+        entries.forEach { summary.add(it) }
+
+        println(summary)
     }
 
-    private fun readFile() {
+    private fun readEntries(): List<ExportEntry> {
         val lines = Files.readAllLines(Paths.get(exportFilePath), Charset.forName("ISO-8859-1"))
-        val dataWithoutHeaders = lines.subList(2, lines.size).joinToString("\\n")
 
-        val mapper = CsvMapper()
-        val schema = mapper.schemaFor(ExportEntry::class.java)
-                .withColumnSeparator(';')
-        mapper.readerWithSchemaFor(ExportEntry::class.java)
-                .with(schema)
-                .readValue<List<ExportEntry>>(dataWithoutHeaders)
+        // skip 2 header lines
+        lines.removeAt(0)
+        lines.removeAt(0)
+
+        // parse to entries
+        val converter = ExportEntryConverter()
+        return lines.map {  converter.convert(it) }.toList()
+    }
+
+
+    private fun readEntries2(): List<ExportEntry> {
+        // read
+        val reader = InputStreamReader(FileInputStream(exportFilePath), Charset.forName("ISO-8859-1"))
+        val csvMapper = CsvMapper()
+        val csvSchema = csvMapper.schema().withColumnSeparator(';')
+        csvMapper.enable(CsvParser.Feature.WRAP_AS_ARRAY)
+        val rows = csvMapper.readerFor(List::class.java).with(csvSchema).readValues<List<String>>(reader)
+        val lines = rows.readAll().toMutableList()
+
+        // skip 2 header lines
+        lines.removeAt(0)
+        lines.removeAt(0)
+
+        // parse to entries
+        val converter = ExportEntryConverter()
+        return lines.map {  converter.convert(it) }.toList()
     }
 }
 

@@ -31,7 +31,7 @@ class ExportEntryConverter {
                     umsatz = parseAmount(parts[0]),
                     sollHaben = SollHaben.valueOf(parts[1]),
                     gegenkonto = parts[7].toInt(),
-                    monat = dateMonthRegexp.matchEntire(parts[8])?.groupValues?.get(2)?.toInt() ?: -1
+                    monat = dateMonthRegexp.matchEntire(parts[9])?.groupValues?.get(2)?.toInt() ?: -1
             )
         } catch (iae: IllegalArgumentException) {
             throw ParseException(parts.joinToString(";"), iae)

@@ -1,25 +1,26 @@
 package de.auinger.datev.summierer
 
-import com.fasterxml.jackson.databind.MappingIterator
-import com.fasterxml.jackson.databind.ObjectReader
 import com.fasterxml.jackson.dataformat.csv.CsvMapper
 import com.fasterxml.jackson.dataformat.csv.CsvParser
-import java.io.File
 import java.io.FileInputStream
-import java.io.FileReader
 import java.io.InputStreamReader
 import java.nio.charset.Charset
 import java.nio.file.Files
 import java.nio.file.Paths
 
 
-class Summarizer(private val exportFilePath:String) : Runnable {
+class Summarizer(
+        private val exportFilePath:String,
+        private val month: Int
+) : Runnable {
 
     override fun run() {
         val entries = readEntries2()
 
         val summary = Summary()
-        entries.forEach { summary.add(it) }
+        entries
+                .filter { it.monat == month }
+                .forEach { summary.add(it) }
 
         println(summary)
     }
@@ -55,17 +56,3 @@ class Summarizer(private val exportFilePath:String) : Runnable {
         return lines.map {  converter.convert(it) }.toList()
     }
 }
-
-/*
-
-           val mapper = CsvMapper()
-            val schema = mapper.schemaFor(TriviaQuestionImportDto::class.java)
-                    .withHeader()
-                    .withStrictHeaders(true)
-                    .withColumnSeparator('\t')
-            return mapper.readerFor(TriviaQuestionImportDto::class.java)
-                    .with(schema)
-                    .readValues<TriviaQuestionImportDto>(csv)
-                    .readAll()
-
- */

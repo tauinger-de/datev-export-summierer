@@ -7,10 +7,11 @@ import java.io.InputStreamReader
 import java.nio.charset.Charset
 import java.nio.file.Files
 import java.nio.file.Paths
+import java.time.LocalDate
 
 
 class Summarizer(
-        private val exportFilePath:String,
+        private val exportFilePath: String,
         private val month: Int
 ) : Runnable {
 
@@ -25,6 +26,17 @@ class Summarizer(
         println(summary)
     }
 
+
+    private val summaryItems = mutableMapOf<SummaryItem,SummaryItem>()
+
+    private fun getOrCreateSummaryItem(entry: ExportEntry): SummaryItem {
+        val summaryItem = SummaryItem(
+                datum = LocalDate.of(2020, entry.monat, 1),
+                belegInfo = "TODO",
+                belegNr = "TODO")
+    }
+
+
     private fun readEntries(): List<ExportEntry> {
         val lines = Files.readAllLines(Paths.get(exportFilePath), Charset.forName("ISO-8859-1"))
 
@@ -34,7 +46,7 @@ class Summarizer(
 
         // parse to entries
         val converter = ExportEntryConverter()
-        return lines.map {  converter.convert(it) }.toList()
+        return lines.map { converter.convert(it) }.toList()
     }
 
 
@@ -53,6 +65,6 @@ class Summarizer(
 
         // parse to entries
         val converter = ExportEntryConverter()
-        return lines.map {  converter.convert(it) }.toList()
+        return lines.map { converter.convert(it) }.toList()
     }
 }

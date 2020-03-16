@@ -8,7 +8,7 @@ class SummaryItem(
         val belegNr: String,
         val belegInfo: String
 ) {
-    private val betraege = mutableMapOf<Type, BigDecimal>()
+    val betraege = mutableMapOf<Type, BigDecimal>()
 
     fun add(betrag:BigDecimal, type: Type) {
         val betragVorher = betraege.computeIfAbsent(type) { BigDecimal.ZERO }
@@ -46,6 +46,8 @@ enum class Type {
     ERLOES_UMST,
     AUSGABE_ABZUGSFAEHIG,
     AUSGABE_NICHT_ABZUGSFAEHIG,
-    VORSTEUER
+    VORSTEUER,
+    PRIVATENTNAHMEN,
+    PRIVATEINLAGEN
 
 }

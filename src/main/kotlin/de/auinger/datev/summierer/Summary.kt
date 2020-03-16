@@ -2,7 +2,9 @@ package de.auinger.datev.summierer
 
 import java.math.BigDecimal
 import java.text.NumberFormat
+import java.time.LocalDate
 import java.util.*
+import de.auinger.datev.summierer.sumByBigDecimal
 
 class Summary {
 
@@ -20,6 +22,26 @@ class Summary {
 
     var umStVorauszahlung: BigDecimal = BigDecimal.ZERO
 
+
+    fun add(entry: ExportEntry) {
+        val summaryItem = getOrCreateSummaryItem(entry = entry)
+
+        when (entry.gegenkonto) {
+            1800 -> {
+                summaryItem.add(betrag = entry.umsatz, type = Type.PRIVATENTNAHMEN)
+            }
+            1890 -> {
+                summaryItem.add(betrag = entry.umsatz, type = Type.PRIVATEINLAGEN)
+            }
+            in 4000..4999 -> {
+                summaryItem.add(betrag = entry.umsatz, type = Type.AUSGABE_ABZUGSFAEHIG)
+            }
+            else -> throw IllegalArgumentException(entry.gegenkonto.toString())
+        }
+
+    }
+
+    /*
     fun add(entry: ExportEntry) {
         when (entry.gegenkonto) {
             400 -> {
@@ -54,7 +76,34 @@ class Summary {
             else -> throw IllegalArgumentException(entry.gegenkonto.toString())
         }
     }
+     */
 
+
+    private val summaryItems = mutableMapOf<SummaryItem, SummaryItem>()
+
+    private fun getOrCreateSummaryItem(entry: ExportEntry): SummaryItem {
+        val summaryItemKey = SummaryItem(
+                datum = LocalDate.of(2020, entry.monat, 1),
+                belegInfo = "TODO",
+                belegNr = "TODO")
+        return summaryItems.computeIfAbsent(summaryItemKey) { it }
+    }
+
+
+    private fun amountsByType(): Map<Type, BigDecimal> {
+        return summaryItems.values
+                .flatMap { it.betraege.entries }
+                .groupBy({ it.key }, { it.value })
+                .map { it.key to it.value.sumByBigDecimal { it } }
+                .toMap()
+    }
+
+
+    override fun toString(): String {
+        return amountsByType()
+    }
+
+    /*
     override fun toString(): String {
         val format = NumberFormat.getCurrencyInstance(Locale.GERMANY)
         return "erloeseBrutto:\t" + format.format(erloeseBrutto.toDouble()) +
@@ -68,4 +117,5 @@ class Summary {
                 "\nabsetzbareAbschreibung:\t" + format.format(absetzbareAbschreibung.toDouble()) +
                 "\numStVorauszahlung:\t" + format.format(umStVorauszahlung.toDouble())
     }
+    */
 }

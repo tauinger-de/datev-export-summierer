@@ -5,9 +5,6 @@ import com.fasterxml.jackson.dataformat.csv.CsvParser
 import java.io.FileInputStream
 import java.io.InputStreamReader
 import java.nio.charset.Charset
-import java.nio.file.Files
-import java.nio.file.Paths
-import java.time.LocalDate
 
 
 class Summarizer(
@@ -16,7 +13,7 @@ class Summarizer(
 ) : Runnable {
 
     override fun run() {
-        val entries = readEntries2()
+        val entries = readEntries()
 
         val summary = Summary()
         entries
@@ -27,30 +24,7 @@ class Summarizer(
     }
 
 
-    private val summaryItems = mutableMapOf<SummaryItem,SummaryItem>()
-
-    private fun getOrCreateSummaryItem(entry: ExportEntry): SummaryItem {
-        val summaryItem = SummaryItem(
-                datum = LocalDate.of(2020, entry.monat, 1),
-                belegInfo = "TODO",
-                belegNr = "TODO")
-    }
-
-
     private fun readEntries(): List<ExportEntry> {
-        val lines = Files.readAllLines(Paths.get(exportFilePath), Charset.forName("ISO-8859-1"))
-
-        // skip 2 header lines
-        lines.removeAt(0)
-        lines.removeAt(0)
-
-        // parse to entries
-        val converter = ExportEntryConverter()
-        return lines.map { converter.convert(it) }.toList()
-    }
-
-
-    private fun readEntries2(): List<ExportEntry> {
         // read
         val reader = InputStreamReader(FileInputStream(exportFilePath), Charset.forName("ISO-8859-1"))
         val csvMapper = CsvMapper()

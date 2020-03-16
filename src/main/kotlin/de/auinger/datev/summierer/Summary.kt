@@ -1,32 +1,27 @@
 package de.auinger.datev.summierer
 
 import java.math.BigDecimal
-import java.text.NumberFormat
+import java.math.RoundingMode
 import java.time.LocalDate
-import java.util.*
-import de.auinger.datev.summierer.sumByBigDecimal
 
 class Summary {
-
-    var erloeseBrutto: BigDecimal = BigDecimal.ZERO
-    var erloeseNetto: BigDecimal = BigDecimal.ZERO
-    var erloeseUmSt: BigDecimal = BigDecimal.ZERO
-
-    var privatEinlagen: BigDecimal = BigDecimal.ZERO
-    var privatEntnahmen: BigDecimal = BigDecimal.ZERO
-
-    var ausgabenNetto: BigDecimal = BigDecimal.ZERO
-    var abziehbareVorsteuer: BigDecimal = BigDecimal.ZERO
-    var nichtAbsetzbareInvestitionen: BigDecimal = BigDecimal.ZERO
-    var absetzbareAbschreibung: BigDecimal = BigDecimal.ZERO
-
-    var umStVorauszahlung: BigDecimal = BigDecimal.ZERO
-
 
     fun add(entry: ExportEntry) {
         val summaryItem = getOrCreateSummaryItem(entry = entry)
 
         when (entry.gegenkonto) {
+            400 -> {
+                when (entry.sollHaben) {
+                    SollHaben.H -> summaryItem.add(betrag = entry.umsatz, type = Type.INVESTITION_ZUR_ABSCHREIBUNG)
+                    SollHaben.S -> summaryItem.add(betrag = entry.umsatz, type = Type.ABSCHREIBUNG)
+                }
+            }
+            1588, in 1571..1579 -> {
+                summaryItem.add(betrag = entry.umsatz, type = Type.VORSTEUER)
+            }
+            1780 -> {
+                summaryItem.add(betrag = entry.umsatz, type = Type.UMST_VORAUSZAHLUNG)
+            }
             1800 -> {
                 summaryItem.add(betrag = entry.umsatz, type = Type.PRIVATENTNAHMEN)
             }
@@ -36,48 +31,17 @@ class Summary {
             in 4000..4999 -> {
                 summaryItem.add(betrag = entry.umsatz, type = Type.AUSGABE_ABZUGSFAEHIG)
             }
-            else -> throw IllegalArgumentException(entry.gegenkonto.toString())
-        }
-
-    }
-
-    /*
-    fun add(entry: ExportEntry) {
-        when (entry.gegenkonto) {
-            400 -> {
-                when (entry.sollHaben) {
-                    SollHaben.H -> nichtAbsetzbareInvestitionen = nichtAbsetzbareInvestitionen.plus(entry.umsatz)
-                    SollHaben.S -> absetzbareAbschreibung = absetzbareAbschreibung.plus(entry.umsatz)
-                }
-            }
-            1588, in 1571..1579 -> {
-                abziehbareVorsteuer = abziehbareVorsteuer.add(entry.umsatz)
-            }
-            1780 -> {
-                umStVorauszahlung = umStVorauszahlung.add(entry.umsatz)
-            }
-            1800 -> {
-                privatEntnahmen = privatEntnahmen.add(entry.umsatz)
-            }
-            1890 -> {
-                privatEinlagen = privatEinlagen.add(entry.umsatz)
-            }
-            in 4000..4999 -> {
-                ausgabenNetto = ausgabenNetto.plus(entry.umsatz)
-            }
             8400, 8790 -> {
                 val umsatzMitVorzeichen = entry.umsatzMitVorzeichen
-                erloeseBrutto = erloeseBrutto.add(umsatzMitVorzeichen)
-                val netto = umsatzMitVorzeichen.divide(BigDecimal("1.19"), 2, BigDecimal.ROUND_HALF_UP)
-                erloeseNetto = erloeseNetto.add(netto)
+                val netto = umsatzMitVorzeichen.divide(BigDecimal("1.19"), 2, RoundingMode.HALF_UP)
+                summaryItem.add(betrag = netto, type = Type.ERLOES_NETTO)
                 val umSt = umsatzMitVorzeichen.minus(netto)
-                erloeseUmSt = erloeseUmSt.add(umSt)
+                summaryItem.add(betrag = umSt, type = Type.ERLOES_UMST)
             }
             else -> throw IllegalArgumentException(entry.gegenkonto.toString())
         }
-    }
-     */
 
+    }
 
     private val summaryItems = mutableMapOf<SummaryItem, SummaryItem>()
 
@@ -100,7 +64,7 @@ class Summary {
 
 
     override fun toString(): String {
-        return amountsByType()
+        return amountsByType().toString()
     }
 
     /*

@@ -6,7 +6,11 @@ data class ExportEntry(
         val umsatz: BigDecimal,
         val sollHaben: SollHaben,
         val gegenkonto: Int,
-        val monat: Int
+        val tag: Int,
+        val monat: Int,
+        val belegNr: String,
+        val buchungsText: String,
+        val buchungsDetail: String
 ) {
 
     val umsatzMitVorzeichen: BigDecimal

@@ -19,11 +19,6 @@ class ExportEntryConverter {
         }
     }
 
-    fun convert(line: String): ExportEntry {
-        val parts = line.split(";")
-        return convert(parts)
-    }
-
 
     fun convert(parts: List<String>): ExportEntry {
         try {
@@ -31,12 +26,17 @@ class ExportEntryConverter {
                     umsatz = parseAmount(parts[0]),
                     sollHaben = SollHaben.valueOf(parts[1]),
                     gegenkonto = parts[7].toInt(),
-                    monat = dateMonthRegexp.matchEntire(parts[9])?.groupValues?.get(2)?.toInt() ?: -1
+                    tag = dateMonthRegexp.matchEntire(parts[9])?.groupValues?.get(1)?.toInt() ?: -1,
+                    monat = dateMonthRegexp.matchEntire(parts[9])?.groupValues?.get(2)?.toInt() ?: -1,
+                    belegNr = parts[10],
+                    buchungsText = parts[13],
+                    buchungsDetail = parts[23]
             )
         } catch (iae: IllegalArgumentException) {
             throw ParseException(parts.joinToString(";"), iae)
         }
     }
+
 
     private fun parseAmount(str: String): BigDecimal {
         return bigDecimalParser.parseObject(str) as BigDecimal

@@ -23,10 +23,23 @@ class Summary {
                 summaryItem.add(betrag = entry.umsatz, type = Type.UMST_VORAUSZAHLUNG)
             }
             1800 -> {
-                summaryItem.add(betrag = entry.umsatz, type = Type.PRIVATENTNAHMEN)
+                when {
+                    isSoderausgabeKrankenkasse(entry = entry) -> {
+                        summaryItem.add(betrag = entry.umsatz, type = Type.SONDERAUSGABE_KK)
+                    }
+                    isSoderausgabeRente(entry = entry) -> {
+                        summaryItem.add(betrag = entry.umsatz, type = Type.SONDERAUSGABE_RENTE)
+                    }
+                    isPrivatsteuer(entry = entry) -> {
+                        summaryItem.add(betrag = entry.umsatz, type = Type.PRIVATSTEUER)
+                    }
+                    else -> {
+                        summaryItem.add(betrag = entry.umsatz, type = Type.PRIVATENTNAHME)
+                    }
+                }
             }
             1890 -> {
-                summaryItem.add(betrag = entry.umsatz, type = Type.PRIVATEINLAGEN)
+                summaryItem.add(betrag = entry.umsatz, type = Type.PRIVATEINLAGE)
             }
             in 4000..4999 -> {
                 summaryItem.add(betrag = entry.umsatz, type = Type.AUSGABE_ABZUGSFAEHIG)
@@ -40,8 +53,35 @@ class Summary {
             }
             else -> throw IllegalArgumentException(entry.gegenkonto.toString())
         }
-
     }
+
+
+    private fun isSoderausgabeKrankenkasse(entry: ExportEntry): Boolean {
+        val keywords = listOf("barmer")
+        keywords.forEach {
+            if (entry.buchungsDetail.contains(it, true)) return true
+        }
+        return false
+    }
+
+
+    private fun isSoderausgabeRente(entry: ExportEntry): Boolean {
+        val keywords = listOf("rentenversicherung")
+        keywords.forEach {
+            if (entry.buchungsDetail.contains(it, true)) return true
+        }
+        return false
+    }
+
+
+    private fun isPrivatsteuer(entry: ExportEntry): Boolean {
+        val keywords = listOf("steuervorauszahlung")
+        keywords.forEach {
+            if (entry.buchungsDetail.contains(it, true)) return true
+        }
+        return false
+    }
+
 
     private val summaryItems = mutableMapOf<SummaryItem, SummaryItem>()
 
@@ -54,7 +94,7 @@ class Summary {
     }
 
 
-    private fun amountsByType(): Map<Type, BigDecimal> {
+    fun amountsByType(): Map<Type, BigDecimal> {
         return summaryItems.values
                 .flatMap { it.betraege.entries }
                 .groupBy({ it.key }, { it.value })
@@ -66,6 +106,7 @@ class Summary {
     override fun toString(): String {
         return amountsByType().toString()
     }
+
 
     /*
     override fun toString(): String {

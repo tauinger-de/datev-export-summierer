@@ -1,6 +1,8 @@
 package de.auinger.datev.summierer
 
 import java.io.File
+import java.math.BigDecimal
+import java.text.NumberFormat
 
 
 class Summarizer(
@@ -17,6 +19,13 @@ class Summarizer(
                 .forEach { summary.add(it) }
 
         println(summary)
+
+        val amountsByType = summary.amountsByType()
+        val numberFormat = NumberFormat.getInstance()
+        Type.values().forEach {
+            val amount = amountsByType[it] ?: BigDecimal.ZERO
+            println(numberFormat.format(amount))
+        }
     }
 
 }

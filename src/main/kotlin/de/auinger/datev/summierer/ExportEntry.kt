@@ -8,13 +8,19 @@ data class ExportEntry(
         val gegenkonto: Int,
         val tag: Int,
         val monat: Int,
-        val belegNr: String,
+        val belegfeld1: String,
+        val belegfeld2: String,
         val buchungsText: String,
         val buchungsDetail: String
 ) {
 
     val umsatzMitVorzeichen: BigDecimal
         get() = if (sollHaben == SollHaben.S) umsatz else umsatz.negate()
+
+
+    val storniert: Boolean
+        get() = belegfeld2 == "Storno"
+
 }
 
 

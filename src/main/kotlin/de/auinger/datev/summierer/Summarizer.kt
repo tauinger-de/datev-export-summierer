@@ -11,14 +11,12 @@ class Summarizer(
 ) : Runnable {
 
     override fun run() {
-        val entries = ExportReader().readEntries(File(exportFilePath))
+        val exportEntries = ExportReader().readEntries(File(exportFilePath))
 
         val summary = Summary()
-        entries
+        exportEntries
                 .filter { it.monat == month }
                 .forEach { summary.add(it) }
-
-        println(summary)
 
         val amountsByType = summary.amountsByType()
         val numberFormat = NumberFormat.getInstance()
@@ -26,6 +24,12 @@ class Summarizer(
             val amount = amountsByType[it] ?: BigDecimal.ZERO
             println(numberFormat.format(amount))
         }
+
+        OutputWriter().write(
+                summary = summary,
+                templateFile = "report-template.html",
+                outputFile = "report.html"
+        )
     }
 
 }

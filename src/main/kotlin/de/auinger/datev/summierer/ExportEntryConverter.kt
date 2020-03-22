@@ -28,7 +28,8 @@ class ExportEntryConverter {
                     gegenkonto = parts[7].toInt(),
                     tag = dateMonthRegexp.matchEntire(parts[9])?.groupValues?.get(1)?.toInt() ?: -1,
                     monat = dateMonthRegexp.matchEntire(parts[9])?.groupValues?.get(2)?.toInt() ?: -1,
-                    belegNr = parts[10],
+                    belegfeld1 = parts[10],
+                    belegfeld2 = parts[11],
                     buchungsText = parts[13],
                     buchungsDetail = parts[23]
             )

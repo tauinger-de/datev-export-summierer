@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>DATEV Export Auswertung</title>
+    <link href="https://fonts.googleapis.com/css?family=Baloo+Da+2&display=swap" rel="stylesheet">
+    <script type="text/javascript" src="https://code.jquery.com/jquery-1.6.1.js"></script>
+    <style type="text/css">
+        body {
+        font-family: 'Baloo Da 2', cursive;
+        }
+        .columnSelectionSupport thead th {
+        cursor: pointer;
+        }
+        th.text, td.text {
+            text-align:left;
+            padding: 1px 8px;
+        }
+        th.amount, td.amount {
+            text-align:right;
+            padding: 1px 8px;
+        }
+        th.date, td.date {
+            text-align:left;
+            padding: 1px 8px;
+        }
+table {
+  border-collapse: collapse;
+}
+
+table, th, td {
+  border: 1px solid #999;
+}
+    </style>
+</head>
+<body>
+
+<h1>Gesamtsummen</h1>
+<table id="overallAmounts" class="columnSelectionSupport">
+    <thead>
+    <tr>
+        <th title="Click to select column" class="text">Typ</th>
+        <th title="Click to select column" class="amount">Betrag</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="type : ${types}">
+        <td th:text="${type}" class="text">TYPE</td>
+        <td th:text="${#numbers.formatCurrency(amountsByType.get(type))}" class="amount">0,00 €</td>
+    </tr>
+    </tbody>
+</table>
+
+<h1>Positionen</h1>
+<table id="summaryItems">
+    <thead>
+    <tr>
+        <th title="Click to select column" class="date">Datum</th>
+        <th title="Click to select column" class="text">Beleg-Nr</th>
+        <th title="Click to select column" class="text">Beleg-Detail</th>
+        <th title="Click to select column" class="amount">Betrag
+        </th>
+        <th th:each="type : ${types}" class="amount"><span th:text="${type}"/></th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="item : ${summaryItems}">
+        <td th:text="${item.datum}" class="date">01.01.2001</td>
+        <td th:text="${item.belegNr}" class="text">B-12345</td>
+        <td th:text="${item.buchungsDetail}" class="text">Info</td>
+        <td th:text="${#numbers.formatCurrency(item.overallAmount)}" class="amount">0,00 €</td>
+        <td th:each="type : ${types}" class="amount"><span th:text="${#numbers.formatCurrency(item.betraege.get(type))}">0,00 €</span></td>
+    </tr>
+    </tbody>
+</table>
+
+<script>
+function SelectColumn(index, tableId) {
+    var columnSelector = '#' + tableId + ' tbody > tr > td:nth-child(' + (index + 1) + ')';
+    var cells = $(columnSelector);
+
+    // clear existing selections
+    if (window.getSelection) { // all browsers, except IE before version 9
+        window.getSelection().removeAllRanges();
+    }
+    if (document.createRange) {
+        cells.each(function(i, cell) {
+            var rangeObj = document.createRange();
+            rangeObj.selectNodeContents(cell);
+            window.getSelection().addRange(rangeObj);
+        });
+    }
+}
+
+$(document).ready(function() {
+    $('#overallAmounts thead th').each(function(index) {
+        $(this).click(function() {
+            SelectColumn(index, 'overallAmounts');
+        });
+    });
+});
+
+
+
+
+</script>
+</body>
+</html>

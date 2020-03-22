@@ -12,7 +12,7 @@ class Summary {
         when (entry.gegenkonto) {
             400 -> {
                 when (entry.sollHaben) {
-                    SollHaben.H -> summaryItem.add(betrag = entry.umsatz, type = Type.INVESTITION_ZUR_ABSCHREIBUNG)
+                    SollHaben.H -> summaryItem.add(betrag = entry.umsatz, type = Type.INVESTITION)
                     SollHaben.S -> summaryItem.add(betrag = entry.umsatz, type = Type.ABSCHREIBUNG)
                 }
             }
@@ -25,10 +25,10 @@ class Summary {
             1800 -> {
                 when {
                     isSoderausgabeKrankenkasse(entry = entry) -> {
-                        summaryItem.add(betrag = entry.umsatz, type = Type.SONDERAUSGABE_KK)
+                        summaryItem.add(betrag = entry.umsatz, type = Type.KRANKENKASSE)
                     }
                     isSoderausgabeRente(entry = entry) -> {
-                        summaryItem.add(betrag = entry.umsatz, type = Type.SONDERAUSGABE_RENTE)
+                        summaryItem.add(betrag = entry.umsatz, type = Type.RENTE)
                     }
                     isPrivatsteuer(entry = entry) -> {
                         summaryItem.add(betrag = entry.umsatz, type = Type.PRIVATSTEUER)
@@ -42,7 +42,7 @@ class Summary {
                 summaryItem.add(betrag = entry.umsatz, type = Type.PRIVATEINLAGE)
             }
             in 4000..4999 -> {
-                summaryItem.add(betrag = entry.umsatz, type = Type.AUSGABE_ABZUGSFAEHIG)
+                summaryItem.add(betrag = entry.umsatz, type = Type.AUSGABE)
             }
             8400, 8790 -> {
                 val umsatzMitVorzeichen = entry.umsatzMitVorzeichen
@@ -87,9 +87,9 @@ class Summary {
 
     private fun getOrCreateSummaryItem(entry: ExportEntry): SummaryItem {
         val summaryItemKey = SummaryItem(
-                datum = LocalDate.of(2020, entry.monat, 1),
-                belegInfo = "TODO",
-                belegNr = "TODO")
+                datum = LocalDate.of(2020, entry.monat, entry.tag),
+                buchungsDetail = entry.buchungsDetail,
+                belegNr = entry.belegfeld1)
         return summaryItems.computeIfAbsent(summaryItemKey) { it }
     }
 
@@ -100,6 +100,11 @@ class Summary {
                 .groupBy({ it.key }, { it.value })
                 .map { it.key to it.value.sumByBigDecimal { it } }
                 .toMap()
+    }
+
+
+    fun summaryItems(): Collection<SummaryItem> {
+        return this.summaryItems.values
     }
 
 

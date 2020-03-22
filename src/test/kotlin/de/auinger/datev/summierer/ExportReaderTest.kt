@@ -1,6 +1,5 @@
 package de.auinger.datev.summierer
 
-import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
 
 import org.junit.jupiter.api.Assertions.*
@@ -21,7 +20,7 @@ internal class ExportReaderTest {
         assertEquals(4670, exportEntry.gegenkonto)
         assertEquals(3, exportEntry.tag)
         assertEquals(1, exportEntry.monat)
-        assertEquals("B20-223", exportEntry.belegNr)
+        assertEquals("B20-223", exportEntry.belegfeld1)
         assertEquals("Reisekosten Unternehmer", exportEntry.buchungsText)
         assertEquals("LASTSCHRIFT, EREF+0001356097VVM20200145756 MREF+VVM12946 CRED+DE39DBV00000002177 ABWA+DB Vertrieb GmbH SVWZ+Abo17308 Kd12946 EREF: 0001356097VVM20200145756 MREF: VVM12946 CRED: DE39DBV00000002177 IBAN: DE25", exportEntry.buchungsDetail)
     }

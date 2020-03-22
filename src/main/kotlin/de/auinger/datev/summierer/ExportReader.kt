@@ -35,7 +35,7 @@ class ExportReader {
 
         // parse to entries
         val converter = ExportEntryConverter()
-        return lines.map { converter.convert(it) }.filter { !it.storniert }.toList()
+        return lines.map { converter.convert(it) }.toList()
     }
 
 }

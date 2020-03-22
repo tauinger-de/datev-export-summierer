@@ -18,7 +18,7 @@ data class ExportEntry(
         get() = if (sollHaben == SollHaben.S) umsatz else umsatz.negate()
 
 
-    val storniert: Boolean
+    val isReversal: Boolean
         get() = belegfeld2 == "Storno"
 
 }

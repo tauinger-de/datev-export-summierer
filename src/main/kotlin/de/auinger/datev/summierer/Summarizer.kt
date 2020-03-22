@@ -11,8 +11,24 @@ class Summarizer(
 ) : Runnable {
 
     override fun run() {
-        val exportEntries = ExportReader().readEntries(File(exportFilePath))
+        // read all
+        val exportEntries = ExportReader().readEntries(File(exportFilePath)).toMutableList()
 
+        // kick stornos - for each 'reversing' entry should exist a 'reversed' counterpart
+        val reversingEntries = exportEntries.filter { it.isReversal }.toList()
+        exportEntries.removeAll(reversingEntries)
+
+        val reversedEntries = reversingEntries
+                .mapNotNull { reversingEntry ->
+                    exportEntries.firstOrNull { exportEntry ->
+                        reversingEntry.belegfeld1 == exportEntry.belegfeld1 &&
+                        reversingEntry.umsatz == exportEntry.umsatz
+                    }
+                }
+                .toList()
+        exportEntries.removeAll(reversedEntries)
+
+        // build summary
         val summary = Summary()
         exportEntries
                 .filter { it.monat == month }

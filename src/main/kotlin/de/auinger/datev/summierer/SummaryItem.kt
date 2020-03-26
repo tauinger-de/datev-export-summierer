@@ -28,6 +28,7 @@ class SummaryItem(
 
         if (datum != other.datum) return false
         if (belegNr != other.belegNr) return false
+        if (buchungsDetail != other.buchungsDetail) return false
 
         return true
     }
@@ -45,11 +46,13 @@ class SummaryItem(
 enum class Type {
     ERLOES_NETTO,
     ERLOES_UMST,
-    AUSGABE, // voll abzugsfaehig
+    AUSGABE_ABZUGSFAEHIG,
+    AUSGABE_NICHT_ABZUGSFAEHIG,
     INVESTITION, // nicht abzugsfaehig
     VORSTEUER, // gezahlte UmSt auf Ausgaben
     PRIVATEINLAGE,
     PRIVATENTNAHME,
+    SPESEN,
     UMST_VORAUSZAHLUNG,
     KRANKENKASSE, // Sonderausgabe
     RENTE, // Sonderausgabe

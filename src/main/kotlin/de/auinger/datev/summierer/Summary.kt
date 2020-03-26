@@ -41,8 +41,14 @@ class Summary {
             1890 -> {
                 summaryItem.add(betrag = entry.umsatz, type = Type.PRIVATEINLAGE)
             }
+            4654 -> {
+                summaryItem.add(betrag = entry.umsatz, type = Type.AUSGABE_NICHT_ABZUGSFAEHIG)
+            }
+            4674 -> {
+                summaryItem.add(betrag = entry.umsatz, type = Type.SPESEN)
+            }
             in 4000..4999 -> {
-                summaryItem.add(betrag = entry.umsatz, type = Type.AUSGABE)
+                summaryItem.add(betrag = entry.umsatz, type = Type.AUSGABE_ABZUGSFAEHIG)
             }
             8400, 8790 -> {
                 val umsatzMitVorzeichen = entry.umsatzMitVorzeichen

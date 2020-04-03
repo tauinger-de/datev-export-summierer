@@ -63,7 +63,7 @@ class Summary {
 
 
     private fun isSoderausgabeKrankenkasse(entry: ExportEntry): Boolean {
-        val keywords = listOf("barmer")
+        val keywords = listOf("barmer", "DE59ZZZ00000074082")
         keywords.forEach {
             if (entry.buchungsDetail.contains(it, true)) return true
         }

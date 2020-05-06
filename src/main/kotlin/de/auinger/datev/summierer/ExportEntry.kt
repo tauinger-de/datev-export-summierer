@@ -14,9 +14,11 @@ data class ExportEntry(
         val buchungsDetail: String
 ) {
 
-    val umsatzMitVorzeichen: BigDecimal
-        get() = if (sollHaben == SollHaben.S) umsatz else umsatz.negate()
+    val umsatzAlsPositiveAusgabe: BigDecimal
+        get() = if (sollHaben == SollHaben.H) umsatz else umsatz.negate()
 
+    val umsatzAlsPositiveEinnahme: BigDecimal
+        get() = if (sollHaben == SollHaben.S) umsatz else umsatz.negate()
 
     val isReversal: Boolean
         get() = belegfeld2 == "Storno"

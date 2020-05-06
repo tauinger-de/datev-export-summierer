@@ -42,16 +42,16 @@ class Summary {
                 summaryItem.add(betrag = entry.umsatz, type = Type.PRIVATEINLAGE)
             }
             4654 -> {
-                summaryItem.add(betrag = entry.umsatz, type = Type.AUSGABE_NICHT_ABZUGSFAEHIG)
+                summaryItem.add(betrag = entry.umsatzAlsPositiveAusgabe, type = Type.AUSGABE_NICHT_ABZUGSFAEHIG)
             }
             4674 -> {
-                summaryItem.add(betrag = entry.umsatz, type = Type.SPESEN)
+                summaryItem.add(betrag = entry.umsatzAlsPositiveAusgabe, type = Type.SPESEN)
             }
             in 4000..4999 -> {
-                summaryItem.add(betrag = entry.umsatz, type = Type.AUSGABE_ABZUGSFAEHIG)
+                summaryItem.add(betrag = entry.umsatzAlsPositiveAusgabe, type = Type.AUSGABE_ABZUGSFAEHIG)
             }
             8400, 8790 -> {
-                val umsatzMitVorzeichen = entry.umsatzMitVorzeichen
+                val umsatzMitVorzeichen = entry.umsatzAlsPositiveEinnahme
                 val netto = umsatzMitVorzeichen.divide(BigDecimal("1.19"), 2, RoundingMode.HALF_UP)
                 summaryItem.add(betrag = netto, type = Type.ERLOES_NETTO)
                 val umSt = umsatzMitVorzeichen.minus(netto)

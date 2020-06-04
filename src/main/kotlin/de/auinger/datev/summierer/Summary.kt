@@ -47,7 +47,7 @@ class Summary {
             4674 -> {
                 summaryItem.add(betrag = entry.umsatzAlsPositiveAusgabe, type = Type.SPESEN)
             }
-            in 4000..4999 -> {
+            480, in 4000..4999 -> {
                 summaryItem.add(betrag = entry.umsatzAlsPositiveAusgabe, type = Type.AUSGABE_ABZUGSFAEHIG)
             }
             8400, 8790 -> {

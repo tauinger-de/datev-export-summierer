@@ -53,7 +53,7 @@ enum class Type {
     PRIVATEINLAGE,
     PRIVATENTNAHME,
     SPESEN,
-    UMST_VORAUSZAHLUNG,
+    UMSATZSTEUER,
     KRANKENKASSE, // Sonderausgabe
     RENTE, // Sonderausgabe
     PRIVATSTEUER, // Einkommensteuer, Soli, Kirch

@@ -19,8 +19,8 @@ class Summary {
             1588, in 1571..1579 -> {
                 summaryItem.add(betrag = entry.umsatz, type = Type.VORSTEUER)
             }
-            1780 -> {
-                summaryItem.add(betrag = entry.umsatz, type = Type.UMST_VORAUSZAHLUNG)
+            1780, 1790 -> {
+                summaryItem.add(betrag = entry.umsatz, type = Type.UMSATZSTEUER)
             }
             1800 -> {
                 when {
@@ -57,7 +57,7 @@ class Summary {
                 val umSt = umsatzMitVorzeichen.minus(netto)
                 summaryItem.add(betrag = umSt, type = Type.ERLOES_UMST)
             }
-            else -> throw IllegalArgumentException(entry.gegenkonto.toString())
+            else -> throw IllegalArgumentException("No handling for 'Gegenkonto' of $entry")
         }
     }
 
@@ -93,19 +93,20 @@ class Summary {
 
     private fun getOrCreateSummaryItem(entry: ExportEntry): SummaryItem {
         val summaryItemKey = SummaryItem(
-                datum = LocalDate.of(2020, entry.monat, entry.tag),
-                buchungsDetail = entry.buchungsDetail,
-                belegNr = entry.belegfeld1)
+            datum = LocalDate.of(2020, entry.monat, entry.tag),
+            buchungsDetail = entry.buchungsDetail,
+            belegNr = entry.belegfeld1
+        )
         return summaryItems.computeIfAbsent(summaryItemKey) { it }
     }
 
 
     fun amountsByType(): Map<Type, BigDecimal> {
         return summaryItems.values
-                .flatMap { it.betraege.entries }
-                .groupBy({ it.key }, { it.value })
-                .map { it.key to it.value.sumByBigDecimal { it } }
-                .toMap()
+            .flatMap { it.betraege.entries }
+            .groupBy({ it.key }, { it.value })
+            .map { it.key to it.value.sumByBigDecimal { it } }
+            .toMap()
     }
 
 

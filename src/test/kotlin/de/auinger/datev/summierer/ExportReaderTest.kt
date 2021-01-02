@@ -11,7 +11,7 @@ internal class ExportReaderTest {
 
     @Test
     fun readEntries() {
-        val entries = ExportReader().readEntries(contentString = exportData)
+        val entries = ExportReader().readEntries(contentString = exportData, jahr = 2020)
         assertEquals(1, entries.size)
 
         val exportEntry = entries[0]

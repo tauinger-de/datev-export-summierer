@@ -11,7 +11,6 @@ class ExportEntryConverter {
 
     companion object {
         private val bigDecimalParser = NumberFormat.getInstance(Locale.GERMAN) as DecimalFormat
-        private val dateParser = DateTimeFormatter.ofPattern("ddMM")
         private val dateMonthRegexp = """(\d?\d)(\d\d)""".toRegex()
 
         init {
@@ -20,14 +19,16 @@ class ExportEntryConverter {
     }
 
 
-    fun convert(parts: List<String>): ExportEntry {
+    fun convert(parts: List<String>, jahr: Int): ExportEntry {
         try {
             return ExportEntry(
                     umsatz = parseAmount(parts[0]),
                     sollHaben = SollHaben.valueOf(parts[1]),
+                    konto = parts[6].toInt(),
                     gegenkonto = parts[7].toInt(),
                     tag = dateMonthRegexp.matchEntire(parts[9])?.groupValues?.get(1)?.toInt() ?: -1,
                     monat = dateMonthRegexp.matchEntire(parts[9])?.groupValues?.get(2)?.toInt() ?: -1,
+                    jahr = jahr,
                     belegfeld1 = parts[10],
                     belegfeld2 = parts[11],
                     buchungsText = parts[13],

@@ -9,6 +9,10 @@ class Summary {
     fun add(entry: ExportEntry) {
         val summaryItem = getOrCreateSummaryItem(entry = entry)
 
+//        if (entry.konto !in listOf(1800,1890)) {
+//            println("Buchung auf Konto ${entry.konto}")
+//        }
+
         when (entry.gegenkonto) {
             400 -> {
                 when (entry.sollHaben) {
@@ -48,11 +52,20 @@ class Summary {
                 summaryItem.add(betrag = entry.umsatzAlsPositiveAusgabe, type = Type.SPESEN)
             }
             480, in 4000..4999 -> {
-                summaryItem.add(betrag = entry.umsatzAlsPositiveAusgabe, type = Type.AUSGABE_ABZUGSFAEHIG)
+                // ignore GWG-Abschreibungsbuchungen at end of year since we included their value already via 480 gegenkonto
+                if (entry.konto != 4855) {
+                    summaryItem.add(betrag = entry.umsatzAlsPositiveAusgabe, type = Type.AUSGABE_ABZUGSFAEHIG)
+                }
             }
             8400, 8790 -> {
+                // thx to Corona we have only 16% UmSt for 1.7.2020 - 31.12.2020
                 val umsatzMitVorzeichen = entry.umsatzAlsPositiveEinnahme
-                val netto = umsatzMitVorzeichen.divide(BigDecimal("1.19"), 2, RoundingMode.HALF_UP)
+                val netto = if (entry.jahr == 2020 && entry.monat >= 7) {
+                    umsatzMitVorzeichen.divide(BigDecimal("1.16"), 2, RoundingMode.HALF_UP)
+                }
+                else {
+                    umsatzMitVorzeichen.divide(BigDecimal("1.19"), 2, RoundingMode.HALF_UP)
+                }
                 summaryItem.add(betrag = netto, type = Type.ERLOES_NETTO)
                 val umSt = umsatzMitVorzeichen.minus(netto)
                 summaryItem.add(betrag = umSt, type = Type.ERLOES_UMST)

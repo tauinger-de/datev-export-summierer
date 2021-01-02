@@ -7,7 +7,7 @@ import java.text.NumberFormat
 
 class Summarizer(
         private val exportFilePath: String,
-        private val month: Int
+        private val month: Int?
 ) : Runnable {
 
     override fun run() {
@@ -31,7 +31,7 @@ class Summarizer(
         // build summary
         val summary = Summary()
         exportEntries
-                .filter { it.monat == month }
+                .filter { month == null || it.monat == month }
                 .forEach { summary.add(it) }
 
         val amountsByType = summary.amountsByType()

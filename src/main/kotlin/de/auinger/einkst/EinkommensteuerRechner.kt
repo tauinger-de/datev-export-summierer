@@ -80,4 +80,5 @@ class EinkommensteuerRechner {
             (einkommensteuerMitKinderFreibetrag * 0.055).toInt()
         }
     }
+
 }

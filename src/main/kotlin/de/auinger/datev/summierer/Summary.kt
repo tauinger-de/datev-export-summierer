@@ -79,7 +79,7 @@ class Summary {
 
 
     private fun isSoderausgabeKrankenkasse(entry: ExportEntry): Boolean {
-        val keywords = listOf("barmer", "DE59ZZZ00000074082")
+        val keywords = listOf("barmer", "DE59ZZZ00000074082", "S202453116", "Beitrag 01.11.2021 - 30.11.2021", "krankenkasse", "bkk")
         keywords.forEach {
             if (entry.buchungsDetail.contains(it, true)) return true
         }
@@ -97,7 +97,7 @@ class Summary {
 
 
     private fun isPrivatsteuer(entry: ExportEntry): Boolean {
-        val keywords = listOf("steuervorauszahlung", "Kirchensteuer")
+        val keywords = listOf("steuervorauszahlung", "einkommensteuer", "kirchensteuer")
         keywords.forEach {
             if (entry.buchungsDetail.contains(it, true)) return true
         }

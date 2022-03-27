@@ -57,5 +57,6 @@ enum class Type {
     KRANKENKASSE, // Sonderausgabe
     RENTE, // Sonderausgabe
     PRIVATSTEUER, // Einkommensteuer, Soli, Kirch
-    ABSCHREIBUNG // voll abzugsfaehig
+    ABSCHREIBUNG, // voll abzugsfaehig
+    ALTERSVORSORGE
 }

@@ -24,7 +24,7 @@ class Summary {
                 summaryItem.add(betrag = entry.umsatz, type = Type.VORSTEUER)
             }
             1780, 1790 -> {
-                summaryItem.add(betrag = entry.umsatz, type = Type.UMSATZSTEUER)
+                summaryItem.add(betrag = entry.umsatzAlsPositiveAusgabe, type = Type.UMSATZSTEUER)
             }
             1800 -> {
                 when {
@@ -36,6 +36,9 @@ class Summary {
                     }
                     isPrivatsteuer(entry = entry) -> {
                         summaryItem.add(betrag = entry.umsatz, type = Type.PRIVATSTEUER)
+                    }
+                    isAltersvorsorge(entry = entry) -> {
+                        summaryItem.add(betrag = entry.umsatz, type = Type.ALTERSVORSORGE)
                     }
                     else -> {
                         summaryItem.add(betrag = entry.umsatz, type = Type.PRIVATENTNAHME)
@@ -94,7 +97,16 @@ class Summary {
 
 
     private fun isPrivatsteuer(entry: ExportEntry): Boolean {
-        val keywords = listOf("steuervorauszahlung")
+        val keywords = listOf("steuervorauszahlung", "Kirchensteuer")
+        keywords.forEach {
+            if (entry.buchungsDetail.contains(it, true)) return true
+        }
+        return false
+    }
+
+
+    private fun isAltersvorsorge(entry: ExportEntry): Boolean {
+        val keywords = listOf("Privatentnahme zur Investition", "Altersvorsorge")
         keywords.forEach {
             if (entry.buchungsDetail.contains(it, true)) return true
         }

@@ -7,6 +7,10 @@ import java.time.LocalDate
 class Summary {
 
     fun add(entry: ExportEntry) {
+        // ignore items with 0.00 amount so we don't have to deal with weird konto/gegenkonto combinations that don't actually change anything
+        if (BigDecimal.ZERO.compareTo(entry.umsatz) == 0) return
+
+        // get summary item to update
         val summaryItem = getOrCreateSummaryItem(entry = entry)
 
 //        if (entry.konto !in listOf(1800,1890)) {

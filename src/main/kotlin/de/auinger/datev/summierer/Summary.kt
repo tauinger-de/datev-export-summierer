@@ -101,7 +101,7 @@ class Summary {
 
 
     private fun isPrivatsteuer(entry: ExportEntry): Boolean {
-        val keywords = listOf("steuervorauszahlung", "einkommensteuer", "kirchensteuer")
+        val keywords = listOf("steuervorauszahlung", "einkommensteuer", "kirchensteuer", "KIRCHENEINKOMMENST")
         keywords.forEach {
             if (entry.buchungsDetail.contains(it, true)) return true
         }

@@ -58,7 +58,7 @@ class Summary {
             4674 -> {
                 summaryItem.add(betrag = entry.umsatzAlsPositiveAusgabe, type = Type.SPESEN)
             }
-            480, 3123, in 4000..4999 -> {
+            480, 3123, 3830, in 4000..4999 -> {
                 // ignore GWG-Abschreibungsbuchungen at end of year since we included their value already via 480 gegenkonto
                 if (entry.konto != 4855) {
                     summaryItem.add(betrag = entry.umsatzAlsPositiveAusgabe, type = Type.AUSGABE_ABZUGSFAEHIG)

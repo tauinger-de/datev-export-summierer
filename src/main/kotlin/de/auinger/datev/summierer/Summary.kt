@@ -49,7 +49,7 @@ class Summary {
                     }
                 }
             }
-            1890 -> {
+            1890, 2650 -> {
                 summaryItem.add(betrag = entry.umsatz, type = Type.PRIVATEINLAGE)
             }
             4654 -> {
@@ -58,7 +58,7 @@ class Summary {
             4674 -> {
                 summaryItem.add(betrag = entry.umsatzAlsPositiveAusgabe, type = Type.SPESEN)
             }
-            480, in 4000..4999 -> {
+            480, 3123, in 4000..4999 -> {
                 // ignore GWG-Abschreibungsbuchungen at end of year since we included their value already via 480 gegenkonto
                 if (entry.konto != 4855) {
                     summaryItem.add(betrag = entry.umsatzAlsPositiveAusgabe, type = Type.AUSGABE_ABZUGSFAEHIG)
@@ -79,6 +79,11 @@ class Summary {
             }
             else -> throw IllegalArgumentException("No handling for 'Gegenkonto' of $entry")
         }
+    }
+
+
+    private fun calculateNetAmount(grossAmount:BigDecimal, taxPercent:Int=19): BigDecimal {
+        return grossAmount.divide(BigDecimal("1.$taxPercent"), 2, RoundingMode.HALF_UP);
     }
 
 

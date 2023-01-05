@@ -88,7 +88,8 @@ class Summary {
 
 
     private fun isSoderausgabeKrankenkasse(entry: ExportEntry): Boolean {
-        val keywords = listOf("barmer", "DE59ZZZ00000074082", "S202453116", "Beitrag 01.11.2021 - 30.11.2021", "krankenkasse", "bkk")
+        val keywords = listOf("barmer", "DE59ZZZ00000074082", "S202453116", "Beitrag 01.11.2021 - 30.11.2021", "krankenkasse", "bkk",
+            "Beitrag 01.09.2022 - 11.09.2022")
         keywords.forEach {
             if (entry.buchungsDetail.contains(it, true)) return true
         }

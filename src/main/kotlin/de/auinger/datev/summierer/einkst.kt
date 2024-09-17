@@ -4,7 +4,7 @@ import de.auinger.einkst.BerechnungsParameter
 import de.auinger.einkst.Eingaben
 import de.auinger.einkst.Rechner
 
-fun main(args:Array<String>) {
+fun main() {
     val rechner = Rechner(
             eingaben = Eingaben(
                     ueberschuss = 67_338,

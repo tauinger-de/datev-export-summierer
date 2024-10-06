@@ -4,9 +4,9 @@ import java.math.BigDecimal
 import java.time.LocalDate
 
 class SummaryItem(
-        val datum: LocalDate,
-        val belegNr: String,
-        val buchungsDetail: String
+    val datum: LocalDate,
+    val belegNr: String,
+    val buchungsDetail: String
 ) {
     val betraege = mutableMapOf<Type, BigDecimal>()
 

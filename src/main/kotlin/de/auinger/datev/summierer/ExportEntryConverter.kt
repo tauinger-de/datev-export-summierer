@@ -3,7 +3,6 @@ package de.auinger.datev.summierer
 import java.math.BigDecimal
 import java.text.DecimalFormat
 import java.text.NumberFormat
-import java.time.format.DateTimeFormatter
 import java.util.*
 
 
@@ -22,17 +21,17 @@ class ExportEntryConverter {
     fun convert(parts: List<String>, jahr: Int): ExportEntry {
         try {
             return ExportEntry(
-                    umsatz = parseAmount(parts[0]),
-                    sollHaben = SollHaben.valueOf(parts[1]),
-                    konto = parts[6].toInt(),
-                    gegenkonto = parts[7].toInt(),
-                    tag = dateMonthRegexp.matchEntire(parts[9])?.groupValues?.get(1)?.toInt() ?: -1,
-                    monat = dateMonthRegexp.matchEntire(parts[9])?.groupValues?.get(2)?.toInt() ?: -1,
-                    jahr = jahr,
-                    belegfeld1 = parts[10],
-                    belegfeld2 = parts[11],
-                    buchungsText = parts[13],
-                    buchungsDetail = parts[23]
+                umsatz = parseAmount(parts[0]),
+                sollHaben = SollHaben.valueOf(parts[1]),
+                konto = parts[6].toInt(),
+                gegenkonto = parts[7].toInt(),
+                tag = dateMonthRegexp.matchEntire(parts[9])?.groupValues?.get(1)?.toInt() ?: -1,
+                monat = dateMonthRegexp.matchEntire(parts[9])?.groupValues?.get(2)?.toInt() ?: -1,
+                jahr = jahr,
+                belegfeld1 = parts[10],
+                belegfeld2 = parts[11],
+                buchungsText = parts[13],
+                buchungsDetail = parts[23]
             )
         } catch (iae: IllegalArgumentException) {
             throw ParseException(parts.joinToString(";"), iae)

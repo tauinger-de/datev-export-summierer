@@ -10,9 +10,9 @@ internal class SummaryItemTest {
     @Test
     fun getOverallAmount() {
         val summaryItem = SummaryItem(
-                datum = LocalDate.now(),
-                belegNr = "1",
-                buchungsDetail = "Blah"
+            datum = LocalDate.now(),
+            belegNr = "1",
+            buchungsDetail = "Blah"
         )
         summaryItem.add(BigDecimal.ONE, Type.ERLOES_NETTO)
         summaryItem.add(BigDecimal.TEN, Type.ERLOES_UMST)

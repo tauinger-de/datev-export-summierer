@@ -3,7 +3,6 @@ package de.auinger.datev.summierer
 import com.fasterxml.jackson.dataformat.csv.CsvMapper
 import com.fasterxml.jackson.dataformat.csv.CsvParser
 import java.io.*
-import java.lang.IllegalStateException
 import java.nio.charset.Charset
 
 class ExportReader {
@@ -15,8 +14,8 @@ class ExportReader {
 
 
     fun readEntries(contentFile: File): List<ExportEntry> {
-        val jahr:Int = """bis_\d\d_\d\d_(\d\d\d\d)_""".toRegex().find(contentFile.name)?.groupValues?.get(1)?.toInt()
-                ?: throw IllegalStateException("Couldn't extract year from input file name")
+        val jahr: Int = """bis_\d\d_\d\d_(\d\d\d\d)_""".toRegex().find(contentFile.name)?.groupValues?.get(1)?.toInt()
+            ?: throw IllegalStateException("Couldn't extract year from input file name")
         println("Für Jahr: $jahr")
         val reader = InputStreamReader(FileInputStream(contentFile), Charset.forName("ISO-8859-1"))
         return internalReadEntries(reader = reader, jahr = jahr)

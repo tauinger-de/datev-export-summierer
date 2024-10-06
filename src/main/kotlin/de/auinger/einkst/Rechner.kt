@@ -50,7 +50,8 @@ class Rechner(
         // prep
         val kindergeld = kindergeld(anzahlKinder = eingaben.anzahlKinder)
         val kinderfreibetrag = parameter.kinderfreibetrag * eingaben.anzahlKinder
-        val zvE = eingaben.ueberschuss - ergebnis.krankenkassenbeitrag - ergebnis.pflegeversicherungsbeitrag + eingaben.zusaetzlichesZvE
+        val zvE =
+            eingaben.ueberschuss - ergebnis.krankenkassenbeitrag - ergebnis.pflegeversicherungsbeitrag + eingaben.zusaetzlichesZvE
 
         val einkommensteuerOhneKinderFreibetrag =
             if (eingaben.anzahlKinder > 0) {
@@ -83,13 +84,16 @@ class Rechner(
                 val y = (zvE - parameter.zveLimit1) / 10000.0
                 ((980.14 * y + 1400) * y).toInt()
             }
+
             zvE <= parameter.zveLimit3 -> {
                 val z = (zvE - 14254) / 10000.0
                 ((216.16 * z + 2397) * z + 965.58).toInt()
             }
+
             zvE <= parameter.zveLimit4 -> {
                 (0.42 * zvE - 8780.9).toInt()
             }
+
             else -> {
                 (0.45 * zvE - 16740.68).toInt()
             }

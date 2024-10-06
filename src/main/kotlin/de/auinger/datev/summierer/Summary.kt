@@ -24,72 +24,86 @@ class Summary {
                     SollHaben.S -> summaryItem.add(betrag = entry.umsatz, type = Type.ABSCHREIBUNG)
                 }
             }
+
             1588, in 1571..1579 -> {
                 summaryItem.add(betrag = entry.umsatz, type = Type.VORSTEUER)
             }
+
             1780, 1790 -> {
                 summaryItem.add(betrag = entry.umsatzAlsPositiveAusgabe, type = Type.UMSATZSTEUER)
             }
+
             1800 -> {
                 when {
                     isSoderausgabeKrankenkasse(entry = entry) -> {
                         summaryItem.add(betrag = entry.umsatz, type = Type.KRANKENKASSE)
                     }
+
                     isSoderausgabeRente(entry = entry) -> {
                         summaryItem.add(betrag = entry.umsatz, type = Type.RENTE)
                     }
+
                     isPrivatsteuer(entry = entry) -> {
                         summaryItem.add(betrag = entry.umsatz, type = Type.PRIVATSTEUER)
                     }
+
                     isAltersvorsorge(entry = entry) -> {
                         summaryItem.add(betrag = entry.umsatz, type = Type.ALTERSVORSORGE)
                     }
+
                     else -> {
                         summaryItem.add(betrag = entry.umsatz, type = Type.PRIVATENTNAHME)
                     }
                 }
             }
+
             1890, 2650 -> {
                 summaryItem.add(betrag = entry.umsatz, type = Type.PRIVATEINLAGE)
             }
+
             4654 -> {
                 summaryItem.add(betrag = entry.umsatzAlsPositiveAusgabe, type = Type.AUSGABE_NICHT_ABZUGSFAEHIG)
             }
+
             4674 -> {
                 summaryItem.add(betrag = entry.umsatzAlsPositiveAusgabe, type = Type.SPESEN)
             }
+
             480, 3123, 3830, in 4000..4999 -> {
                 // ignore GWG-Abschreibungsbuchungen at end of year since we included their value already via 480 gegenkonto
                 if (entry.konto != 4855) {
                     summaryItem.add(betrag = entry.umsatzAlsPositiveAusgabe, type = Type.AUSGABE_ABZUGSFAEHIG)
                 }
             }
+
             8400, 8790 -> {
                 // thx to Corona we have only 16% UmSt for 1.7.2020 - 31.12.2020
                 val umsatzMitVorzeichen = entry.umsatzAlsPositiveEinnahme
                 val netto = if (entry.jahr == 2020 && entry.monat >= 7) {
                     umsatzMitVorzeichen.divide(BigDecimal("1.16"), 2, RoundingMode.HALF_UP)
-                }
-                else {
+                } else {
                     umsatzMitVorzeichen.divide(BigDecimal("1.19"), 2, RoundingMode.HALF_UP)
                 }
                 summaryItem.add(betrag = netto, type = Type.ERLOES_NETTO)
                 val umSt = umsatzMitVorzeichen.minus(netto)
                 summaryItem.add(betrag = umSt, type = Type.ERLOES_UMST)
             }
+
             else -> throw IllegalArgumentException("No handling for 'Gegenkonto' of $entry")
         }
     }
 
 
-    private fun calculateNetAmount(grossAmount:BigDecimal, taxPercent:Int=19): BigDecimal {
+    private fun calculateNetAmount(grossAmount: BigDecimal, taxPercent: Int = 19): BigDecimal {
         return grossAmount.divide(BigDecimal("1.$taxPercent"), 2, RoundingMode.HALF_UP);
     }
 
 
     private fun isSoderausgabeKrankenkasse(entry: ExportEntry): Boolean {
-        val keywords = listOf("barmer", "DE59ZZZ00000074082", "S202453116", "Beitrag 01.11.2021 - 30.11.2021", "krankenkasse", "bkk",
-            "Beitrag 01.09.2022 - 11.09.2022")
+        val keywords = listOf(
+            "barmer", "DE59ZZZ00000074082", "S202453116", "Beitrag 01.11.2021 - 30.11.2021", "krankenkasse", "bkk",
+            "Beitrag 01.09.2022 - 11.09.2022"
+        )
         keywords.forEach {
             if (entry.buchungsDetail.contains(it, true)) return true
         }

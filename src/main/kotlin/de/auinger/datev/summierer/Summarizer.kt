@@ -6,8 +6,8 @@ import java.text.NumberFormat
 
 
 class Summarizer(
-        private val exportFilePath: String,
-        private val month: Int?
+    private val exportFilePath: String,
+    private val month: Int?
 ) : Runnable {
 
     override fun run() {
@@ -19,20 +19,20 @@ class Summarizer(
         exportEntries.removeAll(reversingEntries)
 
         val reversedEntries = reversingEntries
-                .mapNotNull { reversingEntry ->
-                    exportEntries.firstOrNull { exportEntry ->
-                        reversingEntry.belegfeld1 == exportEntry.belegfeld1 &&
-                        reversingEntry.umsatz == exportEntry.umsatz
-                    }
+            .mapNotNull { reversingEntry ->
+                exportEntries.firstOrNull { exportEntry ->
+                    reversingEntry.belegfeld1 == exportEntry.belegfeld1 &&
+                            reversingEntry.umsatz == exportEntry.umsatz
                 }
-                .toList()
+            }
+            .toList()
         exportEntries.removeAll(reversedEntries)
 
         // build summary
         val summary = Summary()
         exportEntries
-                .filter { month == null || it.monat == month }
-                .forEach { summary.add(it) }
+            .filter { month == null || it.monat == month }
+            .forEach { summary.add(it) }
 
         val amountsByType = summary.amountsByType()
         val numberFormat = NumberFormat.getInstance()
@@ -42,9 +42,9 @@ class Summarizer(
         }
 
         OutputWriter().write(
-                summary = summary,
-                templateFile = "report-template.html",
-                outputFile = "report.html"
+            summary = summary,
+            templateFile = "report-template.html",
+            outputFile = "report.html"
         )
     }
 

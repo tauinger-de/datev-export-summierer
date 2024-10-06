@@ -35,16 +35,18 @@ class Summary {
 
             1800 -> {
                 when {
-                    isSoderausgabeKrankenkasse(entry = entry) -> {
-                        summaryItem.add(betrag = entry.umsatz, type = Type.KRANKENKASSE)
-                    }
-
-                    isSoderausgabeRente(entry = entry) -> {
+                    // todo complete refactoring to Type predicate and include Gegenkonto somehow
+                    Type.RENTE.matches(entry) -> {
                         summaryItem.add(betrag = entry.umsatz, type = Type.RENTE)
                     }
-
-                    isPrivatsteuer(entry = entry) -> {
-                        summaryItem.add(betrag = entry.umsatz, type = Type.PRIVATSTEUER)
+                    Type.KRANKENKASSE.matches(entry) -> {
+                        summaryItem.add(betrag = entry.umsatz, type = Type.KRANKENKASSE)
+                    }
+                    Type.EINKOMMENSTEUER_VORAUSZAHLUNG.matches(entry) -> {
+                        summaryItem.add(betrag = entry.umsatz, type = Type.EINKOMMENSTEUER_VORAUSZAHLUNG)
+                    }
+                    Type.KIRCHENSTEUER_VORAUSZAHLUNG.matches(entry) -> {
+                        summaryItem.add(betrag = entry.umsatz, type = Type.KIRCHENSTEUER_VORAUSZAHLUNG)
                     }
 
                     isAltersvorsorge(entry = entry) -> {
@@ -99,36 +101,6 @@ class Summary {
     }
 
 
-    private fun isSoderausgabeKrankenkasse(entry: ExportEntry): Boolean {
-        val keywords = listOf(
-            "barmer", "DE59ZZZ00000074082", "S202453116", "Beitrag 01.11.2021 - 30.11.2021", "krankenkasse", "bkk",
-            "Beitrag 01.09.2022 - 11.09.2022"
-        )
-        keywords.forEach {
-            if (entry.buchungsDetail.contains(it, true)) return true
-        }
-        return false
-    }
-
-
-    private fun isSoderausgabeRente(entry: ExportEntry): Boolean {
-        val keywords = listOf("rentenversicherung")
-        keywords.forEach {
-            if (entry.buchungsDetail.contains(it, true)) return true
-        }
-        return false
-    }
-
-
-    private fun isPrivatsteuer(entry: ExportEntry): Boolean {
-        val keywords = listOf("steuervorauszahlung", "einkommensteuer", "kirchensteuer", "KIRCHENEINKOMMENST")
-        keywords.forEach {
-            if (entry.buchungsDetail.contains(it, true)) return true
-        }
-        return false
-    }
-
-
     private fun isAltersvorsorge(entry: ExportEntry): Boolean {
         val keywords = listOf("Privatentnahme zur Investition", "Altersvorsorge")
         keywords.forEach {
@@ -142,7 +114,7 @@ class Summary {
 
     private fun getOrCreateSummaryItem(entry: ExportEntry): SummaryItem {
         val summaryItemKey = SummaryItem(
-            datum = LocalDate.of(2020, entry.monat, entry.tag),
+            datum = LocalDate.of(entry.jahr, entry.monat, entry.tag),
             buchungsDetail = entry.buchungsDetail,
             belegNr = entry.belegfeld1
         )

@@ -43,7 +43,9 @@ class SummaryItem(
 }
 
 
-enum class Type {
+typealias ExportEntryPredicate = (ExportEntry) -> Boolean
+
+enum class Type(private vararg val predicates: ExportEntryPredicate = emptyArray()) {
     ERLOES_NETTO,
     ERLOES_UMST,
     AUSGABE_ABZUGSFAEHIG,
@@ -54,9 +56,36 @@ enum class Type {
     PRIVATENTNAHME,
     SPESEN,
     UMSATZSTEUER,
-    KRANKENKASSE, // Sonderausgabe
-    RENTE, // Sonderausgabe
-    PRIVATSTEUER, // Einkommensteuer, Soli, Kirch
-    ABSCHREIBUNG, // voll abzugsfaehig
-    ALTERSVORSORGE
+    KRANKENKASSE(
+        keywordPredicate(listOf("krankenkasse", "mkk")),
+        regexpPredicate(""".*Beitrag \d\d.\d\d.20\d\d - \d\d.\d\d.20\d\d.*""")
+    ),
+    RENTE(
+        keywordPredicate(listOf("rentenversicherung", "rente"))
+    ),
+    ARBEITSLOSENVERSICHERUNG, // Sonderausgabe
+    EINKOMMENSTEUER_VORAUSZAHLUNG(
+        keywordPredicate(listOf("steuervorauszahlung", "einkommensteuer"))
+    ),
+    KIRCHENSTEUER_VORAUSZAHLUNG(
+        keywordPredicate(listOf("kirchensteuer", "KIRCHENEINKOMMENST"))
+    ),
+    ABSCHREIBUNG, // voll abzugsfähig
+    ALTERSVORSORGE;
+
+    fun matches(entry: ExportEntry): Boolean {
+        return predicates.any { it.invoke(entry) }
+    }
+}
+
+private fun keywordPredicate(keywords: List<String>): (ExportEntry) -> Boolean {
+    return { entry: ExportEntry ->
+        keywords.any { entry.buchungsDetail.contains(it, ignoreCase = true) }
+    }
+}
+
+private fun regexpPredicate(regexp: String): (ExportEntry) -> Boolean {
+    return { entry: ExportEntry ->
+        regexp.toRegex().containsMatchIn(entry.buchungsDetail)
+    }
 }

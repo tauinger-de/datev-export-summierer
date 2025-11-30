@@ -17,7 +17,8 @@ class OutputWriter {
         templateEngine.setTemplateResolver(templateResolver)
 
         val variables = mapOf(
-            "types" to Type.values(),
+            "types" to Type.entries.toList(),
+            "typeLabels" to Type.entries.associateWith { t -> t.label },
             "amountsByType" to summary.amountsByType(),
             "summaryItems" to summary.summaryItems().toMutableList().sortedBy { it.datum }
         )

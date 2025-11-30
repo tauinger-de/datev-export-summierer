@@ -45,8 +45,8 @@ class Summarizer(
 
         // print cash flow doc-specific summary
         listOf(
-            Type.ERLOES_NETTO, null, Type.AUSGABE_ABZUGSFAEHIG, null, Type.KRANKENKASSE, Type.RENTE,
-            Type.ARBEITSLOSENVERSICHERUNG, null, Type.EINKOMMENSTEUER_VORAUSZAHLUNG, Type.KIRCHENSTEUER_VORAUSZAHLUNG
+            Type.ERLOES_NETTO, Type.AUSGABE_ABZUGSFAEHIG, Type.KRANKENKASSE, Type.RENTE,
+            Type.ARBEITSLOSENVERSICHERUNG, Type.EINKOMMENSTEUER_VORAUSZAHLUNG, Type.KIRCHENSTEUER_VORAUSZAHLUNG
         ).forEach {
             if (it == null) {
                 println()

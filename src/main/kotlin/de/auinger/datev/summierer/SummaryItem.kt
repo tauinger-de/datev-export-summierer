@@ -45,33 +45,35 @@ class SummaryItem(
 
 typealias ExportEntryPredicate = (ExportEntry) -> Boolean
 
-enum class Type(private vararg val predicates: ExportEntryPredicate = emptyArray()) {
-    ERLOES_NETTO,
-    ERLOES_UMST,
-    AUSGABE_ABZUGSFAEHIG,
-    AUSGABE_NICHT_ABZUGSFAEHIG,
-    INVESTITION, // nicht abzugsfaehig
-    VORSTEUER, // gezahlte UmSt auf Ausgaben
-    PRIVATEINLAGE,
-    PRIVATENTNAHME,
-    SPESEN,
-    UMSATZSTEUER,
-    KRANKENKASSE(
-        keywordPredicate(listOf("krankenkasse", "mkk")),
+enum class Type(
+    val label: String,
+    private vararg val predicates: ExportEntryPredicate = emptyArray()
+) {
+    ERLOES_NETTO("Erlöse"),
+    ERLOES_UMST("UmSt"),
+    AUSGABE_ABZUGSFAEHIG("Ausgaben"),
+    AUSGABE_NICHT_ABZUGSFAEHIG("Ausgaben nicht abz.f."),
+    INVESTITION("Investitionen"), // nicht abzugsfaehig
+    VORSTEUER("Vorsteuer"), // gezahlte UmSt auf Ausgaben
+    PRIVATEINLAGE("Privateinlage"),
+    PRIVATENTNAHME("Privatentnahme"),
+    UMSATZSTEUER("gez. UmSt."),
+    KRANKENKASSE("KK-Beiträge",
+        keywordPredicate(listOf("krankenkasse", "mkk", "Beitrag Vormonat")),
         regexpPredicate(""".*Beitrag \d\d.\d\d.20\d\d - \d\d.\d\d.20\d\d.*""")
     ),
-    RENTE(
+    RENTE("RV-Beiträge",
         keywordPredicate(listOf("rentenversicherung", "rente"))
     ),
-    ARBEITSLOSENVERSICHERUNG, // Sonderausgabe
-    EINKOMMENSTEUER_VORAUSZAHLUNG(
-        keywordPredicate(listOf("steuervorauszahlung", "einkommensteuer"))
+    ARBEITSLOSENVERSICHERUNG("AV-Beiträge"), // Sonderausgabe
+    EINKOMMENSTEUER_VORAUSZAHLUNG("EinkSt-Vorausz.",
+        keywordPredicate(listOf("steuervorauszahlung", "einkommensteuer", "EINK.ST", "Rücklage", "Steuerrückstellung"))
     ),
-    KIRCHENSTEUER_VORAUSZAHLUNG(
+    KIRCHENSTEUER_VORAUSZAHLUNG("KirchenSt-Vorausz.",
         keywordPredicate(listOf("kirchensteuer", "KIRCHENEINKOMMENST"))
     ),
-    ABSCHREIBUNG, // voll abzugsfähig
-    ALTERSVORSORGE;
+    ABSCHREIBUNG("Abschreibung"), // voll abzugsfähig
+    ALTERSVORSORGE("private AV");
 
     fun matches(entry: ExportEntry): Boolean {
         return predicates.any { it.invoke(entry) }

@@ -17,7 +17,7 @@ class Summary {
 //            println("Buchung auf Konto ${entry.konto}")
 //        }
 
-        when (entry.gegenkonto) {
+        when (entry.konto) {
             400 -> {
                 when (entry.sollHaben) {
                     SollHaben.H -> summaryItem.add(betrag = entry.umsatz, type = Type.INVESTITION)
@@ -29,8 +29,12 @@ class Summary {
                 summaryItem.add(betrag = entry.umsatz, type = Type.VORSTEUER)
             }
 
-            1780, 1790 -> {
-                summaryItem.add(betrag = entry.umsatzAlsPositiveAusgabe, type = Type.UMSATZSTEUER)
+            1780, 1787, 1790 -> {
+                summaryItem.add(betrag = entry.umsatz, type = Type.UMSATZSTEUER)
+            }
+
+            1791 ->{
+                summaryItem.add(betrag = entry.umsatzAlsPositiveAusgabe, type = Type.ERLOES_UMST)
             }
 
             1800 -> {
@@ -67,20 +71,20 @@ class Summary {
                 summaryItem.add(betrag = entry.umsatzAlsPositiveAusgabe, type = Type.AUSGABE_NICHT_ABZUGSFAEHIG)
             }
 
-            4674 -> {
-                summaryItem.add(betrag = entry.umsatzAlsPositiveAusgabe, type = Type.SPESEN)
-            }
-
             480, 3123, 3830, in 4000..4999 -> {
                 // ignore GWG-Abschreibungsbuchungen at end of year since we included their value already via 480 gegenkonto
                 if (entry.konto != 4855) {
-                    summaryItem.add(betrag = entry.umsatzAlsPositiveAusgabe, type = Type.AUSGABE_ABZUGSFAEHIG)
+                    summaryItem.add(betrag = entry.umsatz, type = Type.AUSGABE_ABZUGSFAEHIG)
                 }
+            }
+
+            8200 -> {
+                // Erstattung Kirchensteuer -- NOOP
             }
 
             8400, 8790 -> {
                 // thx to Corona we have only 16% UmSt for 1.7.2020 - 31.12.2020
-                val umsatzMitVorzeichen = entry.umsatzAlsPositiveEinnahme
+                val umsatzMitVorzeichen = entry.umsatz
                 val netto = if (entry.jahr == 2020 && entry.monat >= 7) {
                     umsatzMitVorzeichen.divide(BigDecimal("1.16"), 2, RoundingMode.HALF_UP)
                 } else {
@@ -91,7 +95,10 @@ class Summary {
                 summaryItem.add(betrag = umSt, type = Type.ERLOES_UMST)
             }
 
-            else -> throw IllegalArgumentException("No handling for 'Gegenkonto' of $entry")
+            else -> {
+                println("WARN :: No handling for Gegenkonto ${entry.gegenkonto} of $entry")
+//                throw IllegalArgumentException("No handling for Gegenkonto ${entry.gegenkonto} of $entry")
+            }
         }
     }
 

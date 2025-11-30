@@ -45,7 +45,7 @@ table, th, td {
     </thead>
     <tbody>
     <tr th:each="type : ${types}">
-        <td th:text="${type}" class="text">TYPE</td>
+        <td th:text="${typeLabels[type]}" class="text">TYPE</td>
         <td th:text="${#numbers.formatCurrency(amountsByType.get(type))}" class="amount">0,00 €</td>
         <td th:text="${#numbers.formatDecimal(amountsByType.get(type), 1, 2)}" class="amount">0,00 €</td>
     </tr>
@@ -61,7 +61,7 @@ table, th, td {
         <th title="Click to select column" class="text">Beleg-Detail</th>
         <th title="Click to select column" class="amount">Betrag
         </th>
-        <th th:each="type : ${types}" class="amount"><span th:text="${type}"/></th>
+        <th th:each="type : ${types}" class="amount"><span th:text="${typeLabels[type]}"/></th>
     </tr>
     </thead>
     <tbody>

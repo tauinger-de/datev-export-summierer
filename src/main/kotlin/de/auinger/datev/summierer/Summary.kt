@@ -6,6 +6,10 @@ import java.time.LocalDate
 
 class Summary {
 
+    private val FACTOR_19_PERCENT = BigDecimal("1.19")
+    private val FACTOR_7_PERCENT = BigDecimal("1.07")
+    private val FACTOR_0_PERCENT = BigDecimal("1.00")
+
     fun add(entry: ExportEntry) {
         // ignore items with 0.00 amount so we don't have to deal with weird konto/gegenkonto combinations that don't actually change anything
         if (BigDecimal.ZERO.compareTo(entry.umsatz) == 0) return
@@ -33,7 +37,7 @@ class Summary {
                 summaryItem.add(betrag = entry.umsatz, type = Type.UMSATZSTEUER)
             }
 
-            1791 ->{
+            1791 -> {
                 summaryItem.add(betrag = entry.umsatzAlsPositiveAusgabe, type = Type.ERLOES_UMST)
             }
 
@@ -43,12 +47,15 @@ class Summary {
                     Type.RENTE.matches(entry) -> {
                         summaryItem.add(betrag = entry.umsatz, type = Type.RENTE)
                     }
+
                     Type.KRANKENKASSE.matches(entry) -> {
                         summaryItem.add(betrag = entry.umsatz, type = Type.KRANKENKASSE)
                     }
+
                     Type.EINKOMMENSTEUER_VORAUSZAHLUNG.matches(entry) -> {
                         summaryItem.add(betrag = entry.umsatz, type = Type.EINKOMMENSTEUER_VORAUSZAHLUNG)
                     }
+
                     Type.KIRCHENSTEUER_VORAUSZAHLUNG.matches(entry) -> {
                         summaryItem.add(betrag = entry.umsatz, type = Type.KIRCHENSTEUER_VORAUSZAHLUNG)
                     }
@@ -78,28 +85,28 @@ class Summary {
                 }
             }
 
-            8200 -> {
-                // Erstattung Kirchensteuer -- NOOP
-            }
-
-            8400, 8790 -> {
-                // thx to Corona we have only 16% UmSt for 1.7.2020 - 31.12.2020
-                val umsatzMitVorzeichen = entry.umsatz
-                val netto = if (entry.jahr == 2020 && entry.monat >= 7) {
-                    umsatzMitVorzeichen.divide(BigDecimal("1.16"), 2, RoundingMode.HALF_UP)
-                } else {
-                    umsatzMitVorzeichen.divide(BigDecimal("1.19"), 2, RoundingMode.HALF_UP)
-                }
-                summaryItem.add(betrag = netto, type = Type.ERLOES_NETTO)
-                val umSt = umsatzMitVorzeichen.minus(netto)
-                summaryItem.add(betrag = umSt, type = Type.ERLOES_UMST)
+            8200, 8400, 8790 -> {
+                val (tax, net) = calcTaxAndNetAmount(entry)
+                summaryItem.add(betrag = tax, type = Type.ERLOES_UMST)
+                summaryItem.add(betrag = net, type = Type.ERLOES_NETTO)
             }
 
             else -> {
-                println("WARN :: No handling for Gegenkonto ${entry.gegenkonto} of $entry")
-//                throw IllegalArgumentException("No handling for Gegenkonto ${entry.gegenkonto} of $entry")
+                println("WARN :: No handling for Konto ${entry.konto} of $entry")
             }
         }
+    }
+
+    private fun calcTaxAndNetAmount(entry: ExportEntry): Pair<BigDecimal, BigDecimal> {
+        val umsatzMitVorzeichen = entry.umsatz
+        val factor = when (entry.konto) {
+            8200 -> FACTOR_0_PERCENT
+            8400, 8790 -> FACTOR_19_PERCENT
+            else -> throw IllegalArgumentException("Unexpected konto ${entry.konto}")
+        }
+        val netto = umsatzMitVorzeichen.divide(factor, 2, RoundingMode.HALF_UP)
+        val umSt = umsatzMitVorzeichen.minus(netto)
+        return Pair(umSt, netto)
     }
 
 
